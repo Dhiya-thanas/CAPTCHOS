@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Unlimited CAPTCHA Types</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+    body {
+        background: #0d0d0d;
+        font-family: 'Orbitron', sans-serif;
+        color: #00ffea;
+        text-align: center;
+        padding-top: 50px;
+        overflow: hidden;
+    }
+
+    /* Animated grid background */
+    body::before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-image: 
+            linear-gradient(rgba(0,255,234,0.08) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,255,234,0.08) 1px, transparent 1px);
+        background-size: 40px 40px;
+        animation: moveGrid 8s linear infinite;
+        z-index: -2;
+    }
+
+    @keyframes moveGrid {
+        from { background-position: 0 0, 0 0; }
+        to { background-position: 40px 40px, 40px 40px; }
+    }
+
+    /* Scanline overlay */
+    body::after {
+        content: "";
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: repeating-linear-gradient(
+            to bottom,
+            rgba(255,255,255,0.03),
+            rgba(255,255,255,0.03) 1px,
+            transparent 1px,
+            transparent 3px
+        );
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    /* Glitch title */
+    h2 {
+        font-size: 2.5rem;
+        color: #d78ad7;
+        text-shadow: 0 0 5px #ff00ff, 0 0 15px #ff33ff, 0 0 30px #ff66ff;
+        animation: glitch 2s infinite;
+        position: center;
+        display: inline-block;
+    }
+
+    @keyframes glitch {
+        0% { text-shadow: 2px 0 red, -2px 0 cyan; }
+        20% { text-shadow: -2px 0 red, 2px 0 cyan; }
+        40% { text-shadow: 2px 0 lime, -2px 0 magenta; }
+        60% { text-shadow: -2px 0 lime, 2px 0 magenta; }
+        100% { text-shadow: 2px 0 red, -2px 0 cyan; }
+    }
+
+    /* Form styling */
+    form {
+        background: rgba(20, 20, 20, 0.85);
+        border: 2px solid #00ffea;
+        border-radius: 10px;
+        display: inline-block;
+        padding: 20px 40px;
+        box-shadow: 0 0 15px #00ffea, 0 0 30px #00ffaa, 0 0 50px rgba(0,255,234,0.5);
+        position: relative;
+    }
+
+    #captcha-question {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        color: #ffcc00;
+        text-shadow: 0 0 5px #ffcc00, 0 0 15px #ffaa00;
+    }
+
+    /* Input fields */
+    input[type="text"] {
+        background: #111;
+        border: 2px solid #00ffea;
+        border-radius: 5px;
+        color: #00ffea;
+        padding: 10px;
+        width: 220px;
+        font-size: 1rem;
+        outline: none;
+        text-align: center;
+        transition: all 0.2s ease-in-out;
+    }
+
+    input[type="text"]:focus {
+        box-shadow: 0 0 15px #00ffea;
+    }
+
+    /* Neon button with glow trails */
+    input[type="submit"] {
+        background: #ff00ff;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        font-size: 1rem;
+        border-radius: 5px;
+        margin-top: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    input[type="submit"]::before {
+        content: "";
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: 0.5s;
+        z-index: -1;
+    }
+
+    input[type="submit"]:hover::before {
+        left: 100%;
+    }
+
+    input[type="submit"]:hover {
+        background: #00ffea;
+        color: black;
+        box-shadow: 0 0 10px #00ffea, 0 0 20px #00ffea;
+    }
+</style>
+</head>
+<body>
+    <h2>CAPTCHA Challenge</h2>
+    <form onsubmit="return validateCaptcha()">
+        <p id="captcha-question"></p>
+        <input type="text" id="captcha-input" required placeholder="Enter your answer">
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <script>
+        let captchaAnswer = "";
+        const captchaElement = document.getElementById("captcha-question");
+
+        const compliments = [
+            "You may think like a human... but I still doubt you!",
+            "You might be 99% human... but that 1% is suspicious.",
+            "Not bad for a meat-based lifeform.",
+            "Congratulations, you passed... barely.",
+            "You survived my challenge... for now.",
+            "Impressive. I guess your brain still works.",
+            "Huh. Didn’t think you’d get that right."
+        ];
+
+        const captchaTypes = [
+            generateMathCaptcha,
+            generateTextCaptcha,
+            generateReverseCaptcha,
+            generateColorCaptcha,
+            generateLogicCaptcha,
+            generateCustomQuestion
+        ];
+
+        const selectedCaptcha = captchaTypes[Math.floor(Math.random() * captchaTypes.length)];
+        selectedCaptcha();
+
+        function generateMathCaptcha() {
+            let a = Math.floor(Math.random() * 10);
+            let b = Math.floor(Math.random() * 10);
+            captchaAnswer = (a + b).toString();
+            captchaElement.textContent = `What is ${a} + ${b}?`;
+        }
+
+        function generateTextCaptcha() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let text = '';
+            for (let i = 0; i < 5; i++) {
+                text += chars[Math.floor(Math.random() * chars.length)];
+            }
+            captchaAnswer = text;
+            captchaElement.textContent = `Type this exactly: ${text}`;
+        }
+
+        function generateReverseCaptcha() {
+            const words = ['apple', 'banana', 'cloud', 'matrix'];
+            let word = words[Math.floor(Math.random() * words.length)];
+            captchaAnswer = word.split('').reverse().join('');
+            captchaElement.textContent = `Type the reverse of: ${word}`;
+        }
+
+        function generateColorCaptcha() {
+            const colors = ['red', 'blue', 'green', 'yellow'];
+            let color = colors[Math.floor(Math.random() * colors.length)];
+            captchaAnswer = color;
+            captchaElement.innerHTML = `What color is this word? <span style="color:${color}; font-weight:bold;">COLOR</span>`;
+        }
+
+        function generateLogicCaptcha() {
+            const numSet = [3, 7, 2, 4];
+            captchaAnswer = "7";
+            captchaElement.textContent = `Which number is odd? [${numSet.join(', ')}]`;
+        }
+
+        function generateCustomQuestion() {
+            captchaAnswer = "blue";
+            captchaElement.textContent = "What color is the sky on a clear day?";
+        }
+
+        function validateCaptcha() {
+            const userInput = document.getElementById("captcha-input").value.trim().toLowerCase();
+            if (userInput === captchaAnswer.toLowerCase()) {
+                alert("✅ " + compliments[Math.floor(Math.random() * compliments.length)]);
+                location.reload();
+                return false;
+            } else {
+                alert("❌ CAPTCHA failed. Try again.");
+                return false;
+            }
+        }
+    </script>
+</body>
+</html>

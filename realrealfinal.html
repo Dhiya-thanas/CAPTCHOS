@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Unlimited CAPTCHA Types</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    body {
+        background-color: #000;
+        font-family: 'Press Start 2P', monospace;
+        color: #00ff66; /* Retro green terminal text */
+        text-align: center;
+        padding-top: 50px;
+        overflow: hidden;
+    }
+
+    /* Scanline overlay */
+    body::after {
+        content: "";
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: repeating-linear-gradient(
+            to bottom,
+            rgba(0, 255, 100, 0.05),
+            rgba(0, 255, 100, 0.05) 1px,
+            transparent 1px,
+            transparent 3px
+        );
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    /* Glowing retro title */
+    h2 {
+        font-size: 1.5rem;
+        color: #00ff66;
+        text-shadow: 0 0 5px #00ff66, 0 0 10px #00ff99;
+        margin-bottom: 20px;
+        animation: blinkTitle 1.5s step-end infinite;
+    }
+
+    @keyframes blinkTitle {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.8; }
+    }
+
+    /* Terminal-style box */
+    form {
+        display: inline-block;
+        background: #001a00;
+        border: 2px solid #00ff66;
+        padding: 20px 40px;
+        text-align: left;
+        box-shadow: 0 0 15px rgba(0, 255, 100, 0.5);
+    }
+
+    #captcha-question {
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+
+    input[type="text"] {
+        background: black;
+        border: 2px solid #00ff66;
+        color: #00ff66;
+        font-family: 'Press Start 2P', monospace;
+        padding: 5px;
+        font-size: 0.8rem;
+        width: 220px;
+        outline: none;
+        margin-bottom: 10px;
+    }
+
+    input[type="text"]:focus {
+        background: #002200;
+        box-shadow: 0 0 5px #00ff66;
+    }
+
+    /* Retro button */
+    input[type="submit"] {
+        background: #003300;
+        border: 2px solid #00ff66;
+        color: #00ff66;
+        font-family: 'Press Start 2P', monospace;
+        font-size: 0.8rem;
+        padding: 5px 15px;
+        cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+        background: #004d00;
+        box-shadow: 0 0 5px #00ff66;
+    }
+
+    /* Flickering cursor after CAPTCHA text */
+    #captcha-question::after {
+        content: "_";
+        animation: blinkCursor 1s step-end infinite;
+        margin-left: 5px;
+    }
+
+    @keyframes blinkCursor {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+    }
+</style>
+</head>
+<body>
+    <h2>CAPTCHA SYSTEM V1.0</h2>
+    <form onsubmit="return validateCaptcha()">
+        <p id="captcha-question"></p>
+        <input type="text" id="captcha-input" required placeholder="TYPE HERE">
+        <br>
+        <input type="submit" value="RUN CHECK">
+    </form>
+
+    <script>
+        let captchaAnswer = "";
+        const captchaElement = document.getElementById("captcha-question");
+
+        const compliments = [
+            "ACCESS GRANTED: You may think like a human... but I still doubt you.",
+            "SYSTEM PASS: You might be 99% human... suspicious 1% detected.",
+            "PASS: Not bad for a meat-based lifeform.",
+            "ACCESS GRANTED: Barely...",
+            "PASS: You survived my challenge... for now.",
+            "SYSTEM PASS: Impressive. Brain still functional.",
+            "PASS: Huh. Didn’t think you’d get that right."
+        ];
+
+        const captchaTypes = [
+            generateMathCaptcha,
+            generateTextCaptcha,
+            generateReverseCaptcha,
+            generateColorCaptcha,
+            generateLogicCaptcha,
+            generateCustomQuestion
+        ];
+
+        const selectedCaptcha = captchaTypes[Math.floor(Math.random() * captchaTypes.length)];
+        selectedCaptcha();
+
+        function generateMathCaptcha() {
+            let a = Math.floor(Math.random() * 10);
+            let b = Math.floor(Math.random() * 10);
+            captchaAnswer = (a + b).toString();
+            captchaElement.textContent = `CALC ${a} + ${b} = ?`;
+        }
+
+        function generateTextCaptcha() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let text = '';
+            for (let i = 0; i < 5; i++) {
+                text += chars[Math.floor(Math.random() * chars.length)];
+            }
+            captchaAnswer = text;
+            captchaElement.textContent = `TYPE EXACTLY: ${text}`;
+        }
+
+        function generateReverseCaptcha() {
+            const words = ['APPLE', 'BANANA', 'CLOUD', 'MATRIX'];
+            let word = words[Math.floor(Math.random() * words.length)];
+            captchaAnswer = word.split('').reverse().join('');
+            captchaElement.textContent = `REVERSE: ${word}`;
+        }
+
+        function generateColorCaptcha() {
+            const colors = ['RED', 'BLUE', 'GREEN', 'YELLOW'];
+            let color = colors[Math.floor(Math.random() * colors.length)];
+            captchaAnswer = color;
+            captchaElement.textContent = `COLOR QUERY: ${color}`;
+        }
+
+        function generateLogicCaptcha() {
+            const numSet = [3, 7, 2, 4];
+            captchaAnswer = "7";
+            captchaElement.textContent = `ODD NUM IN [${numSet.join(', ')}]`;
+        }
+
+        function generateCustomQuestion() {
+            captchaAnswer = "BLUE";
+            captchaElement.textContent = "SKY COLOR ON CLEAR DAY?";
+        }
+
+        function validateCaptcha() {
+            const userInput = document.getElementById("captcha-input").value.trim().toLowerCase();
+            if (userInput === captchaAnswer.toLowerCase()) {
+                alert(compliments[Math.floor(Math.random() * compliments.length)]);
+                location.reload();
+                return false;
+            } else {
+                alert("ACCESS DENIED: CAPTCHA FAILED");
+                return false;
+            }
+        }
+    </script>
+</body>
+</html>
